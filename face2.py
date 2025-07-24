@@ -19,9 +19,9 @@ for lpath1 in os.listdir(path1):
 
 # Now we can see the two face encodings are of the same person with `compare_faces`!
 
-results = face_recognition.compare_faces(my_face_encoding, unk_enc)
+    results = face_recognition.compare_faces(encs, unk_enc)
 
-if any(results) == True:
-    print("It's a picture of me!")
-else:
-    print("It's not a picture of me!")
+    if any(results):
+        print("It's a picture of me!")
+    else:
+        print("It's not a picture of me!")
