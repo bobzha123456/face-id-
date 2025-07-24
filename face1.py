@@ -1,0 +1,26 @@
+import face_recognition
+import os 
+encs=[]
+path = ("/home/czha/Desktop/tiger_folder/face/data")
+for lpath in os.listdir(path):
+    full_path= os.path.join(path,lpath)
+    picture_of_me = face_recognition.load_image_file(full_path)
+    my_face_encoding = face_recognition.face_encodings(picture_of_me)
+    enc=my_face_encoding[0]
+    encs.append(enc)
+
+# my_face_encoding now contains a universal 'encoding' of my facial features that can be compared to any other picture of a face!
+path = ("/home/czha/Desktop/tiger_folder/face/unknown")
+for lpath in os.listdir(path):
+    full_path= os.path.join(path,lpath)
+    unknown_picture = face_recognition.load_image_file(full_path)
+    unknown_face_encoding = face_recognition.face_encodings(unknown_picture)[0]
+
+# Now we can see the two face encodings are of the same person with `compare_faces`!
+
+results = face_recognition.compare_faces([my_face_encoding], unknown_face_encoding)
+
+if any(results[0]) == True:
+    print("It's a picture of me!")
+else:
+    print("It's not a picture of me!")
