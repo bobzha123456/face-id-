@@ -1,42 +1,64 @@
 import face_recognition
-import os 
+import os
 
-dic={'geroge.png':'Geroge','me1.jpg':'Chongyun'}
-file_name=[]
-encs=[]
-path = ("/home/czha/Desktop/tiger_folder/face/data")
-for lpath in os.listdir(path):
-    full_path= os.path.join(path,lpath)
-    picture_of_me = face_recognition.load_image_file(full_path)
-    my_face_encoding = face_recognition.face_encodings(picture_of_me)
-      
-    encs.append(my_face_encoding[0])
-    file_name.append(lpath)
-    print(f"Loaded {len(encs)} known face encodings.")
-    if not encs:
-        print(f"[Warning] No face found in known image {lpath}, skipping.")
+dic = {'geroge.png':'George', 'me1.jpg':'Chongyun'}
+
+known_encs = []
+known_names = []
+
+path_known = "/Users/tigerzha/Documents/py_learning/face_rec.py/data"
+# 只保留扩展名为图片的可处理文件
+for fname in os.listdir(path_known):
+    if fname.startswith('.'):  # 跳过隐藏文件
         continue
-    
+    ext = os.path.splitext(fname)[1].lower()
+    if ext not in ['.jpg', '.jpeg', '.png']:
+        print(f"[Skip] 非图片文件: {fname}")
+        continue
 
-# my_face_encoding now contains a universal 'encoding' of my facial features that can be compared to any other picture of a face!
-path1 = ("/home/czha/Desktop/tiger_folder/face/unknown")
-lpath1 = os.listdir(path1)
+    full = os.path.join(path_known, fname)
+    try:
+        image = face_recognition.load_image_file(full)
+    except Exception as e:
+        print(f"[Error] 无法识别图像 {fname}: {e}")
+        continue
 
-reverse1 = lpath1[len(lpath1)-1]
+    encs = face_recognition.face_encodings(image)
+    if not encs:
+        print(f"[Warning] 未在 {fname} 中识别人脸")
+        continue
 
-full_path1= os.path.join(path1,reverse1)
-unknown_picture = face_recognition.load_image_file(full_path1)
-unknown_face_encoding = face_recognition.face_encodings(unknown_picture)[0]
+    known_encs.append(encs[0])
+    known_names.append(dic.get(fname, fname))
+    print(f"已加载已知人脸：{fname}")
 
-# Now we can see the two face encodings are of the same person with `compare_faces`!
+# 处理 unknown 文件夹
+path_unknown = "/Users/tigerzha/Documents/py_learning/face_rec.py/unknown"
+for fname in os.listdir(path_unknown):
+    if fname.startswith('.'):
+        continue
+    ext = os.path.splitext(fname)[1].lower()
+    if ext not in ['.jpg', '.jpeg', '.png']:
+        continue
 
-results = face_recognition.compare_faces(encs, unknown_face_encoding)
+    full = os.path.join(path_unknown, fname)
+    try:
+        img = face_recognition.load_image_file(full)
+    except Exception as e:
+        print(f"[Error] 无法识别图像 {fname}: {e}")
+        continue
 
-if any(results):
-    
-    idx = results.index(True)  
-    print(file_name)
-    print(idx)
-    print(f"{dic[file_name[idx]]}, welcome home!")
-else:
-    print(f"Unknown person {reverse1},is tring to enter your house")
+    encs_u = face_recognition.face_encodings(img)
+    if not encs_u:
+        print(f"[Warning] 未在未知图像 {fname} 中识别人脸")
+        continue
+
+    unk_enc = encs_u[0]
+    results = face_recognition.compare_faces(known_encs, unk_enc)
+    distances = face_recognition.face_distance(known_encs, unk_enc)
+
+    if any(results):
+        best = distances.argmin()
+        print(f"{known_names[best]}，welcome home! 匹配文件：{fname}")
+    else:
+        print(f"未知人员 '{fname}' 尝试进入！")
