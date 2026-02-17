@@ -7,32 +7,32 @@ known_encs = []
 known_names = []
 
 path_known = "/Users/tigerzha/Documents/py_learning/face_rec.py/data"
-# 只保留扩展名为图片的可处理文件
+
 for fname in os.listdir(path_known):
-    if fname.startswith('.'):  # 跳过隐藏文件
+    if fname.startswith('.'):  
         continue
     ext = os.path.splitext(fname)[1].lower()
     if ext not in ['.jpg', '.jpeg', '.png']:
-        print(f"[Skip] 非图片文件: {fname}")
+        print(f"[Skip] image: {fname}")
         continue
 
     full = os.path.join(path_known, fname)
     try:
         image = face_recognition.load_image_file(full)
     except Exception as e:
-        print(f"[Error] 无法识别图像 {fname}: {e}")
+        print(f"[Error] can't read image {fname}: {e}")
         continue
 
     encs = face_recognition.face_encodings(image)
     if not encs:
-        print(f"[Warning] 未在 {fname} 中识别人脸")
+        print(f"[Warning]  {fname} has no facil information")
         continue
 
     known_encs.append(encs[0])
     known_names.append(dic.get(fname, fname))
-    print(f"已加载已知人脸：{fname}")
+    print(f"loading: {fname}")
 
-# 处理 unknown 文件夹
+
 path_unknown = "/Users/tigerzha/Documents/py_learning/face_rec.py/unknown"
 for fname in os.listdir(path_unknown):
     if fname.startswith('.'):
@@ -45,12 +45,12 @@ for fname in os.listdir(path_unknown):
     try:
         img = face_recognition.load_image_file(full)
     except Exception as e:
-        print(f"[Error] 无法识别图像 {fname}: {e}")
+        print(f"[Error] can not read the image {fname}: {e}")
         continue
 
     encs_u = face_recognition.face_encodings(img)
     if not encs_u:
-        print(f"[Warning] 未在未知图像 {fname} 中识别人脸")
+        print(f"[Warning] can not read the image {fname} ")
         continue
 
     unk_enc = encs_u[0]
@@ -59,6 +59,6 @@ for fname in os.listdir(path_unknown):
 
     if any(results):
         best = distances.argmin()
-        print(f"{known_names[best]}，welcome home! 匹配文件：{fname}")
+        print(f"{known_names[best]}，welcome home! ：{fname}")
     else:
-        print(f"未知人员 '{fname}' 尝试进入！")
+        print(f"unknwon person '{fname}' attend to entry！")
