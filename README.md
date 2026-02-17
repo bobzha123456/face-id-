@@ -6,7 +6,7 @@ This repository implements a simple yet effective face recognition system in Pyt
 
 The primary application demonstrated is a basic access control mechanism:
 - Matched faces receive a "welcome home" message.
-- Unmatched faces trigger an alert for unknown personnel.
+- Unmatched faces trigger an alert.
 
 This project serves as an educational example of deploying facial recognition for personal security or authentication tasks, highlighting the ease of use of modern computer vision libraries.
 
